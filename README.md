@@ -18,6 +18,6 @@ UI based on C++ Builder Calculator sample in https://github.com/Embarcadero/Blog
 * Regexp is Part of Delphi.
 
 #### Please note 
-developed as a Win32/64 using FMX.
-This is a sample project used to showcase without clutter. Main idea is to bring together a number of good technologies. I believe that the simplest and most effective way was thru' a calculator program. Can be used as a starting point to create a more robust working version.
+Developed as a Win32/64 using FMX.
+This is a sample project used to showcase without clutter. Main idea is to bring together a number of good technologies. I believe that the simplest and most effective way to do this was by a calculator program. Can be used as a starting point to create a more robust working version.
 

@@ -44,18 +44,34 @@ var
 procedure TCalcAppend.AppendDigit(const Value: Char);
 var
   CalcValueChanged: ICalcValueChanged;
-
+  tempStr: String;
 begin
   case Value of
     'B': // BackSpace
       if Length(CalcString) > 0 then
-        CalcString := Copy(CalcString, 1, Length(CalcString) - 1);
+        tempStr := Copy(CalcString, 1, Length(CalcString) - 1);
     'C': // Clear
-      CalcString := '';
+      tempStr := '';
   else
-    CalcString := CalcString + Value;
+    begin
+      tempStr := CalcString + Value;
+      var
+        Match: TMatch;
+        // prevents decimal point followed by [+,-,*,/]
+      Match := TRegEx.Match(tempStr, '(\.[+\-\*\/])');
+      if Match.Success then
+        exit();
+
+      Match := TRegEx.Match(tempStr, '[+-]?(\d+\.?\d*[+\-\*\/]?)*');
+      if (Match.Value <> tempStr) then
+      begin
+        exit();
+      end;
+    end;
   end;
 
+  // if we've got as far tempstr is valid then update expression and notify listeners
+  CalcString := tempStr;
   var
     CalcValueChangedEv: ICalcValueChanged := GetCalcValueChanged();
   GlobalEventBus.post(CalcValueChangedEv);
@@ -67,6 +83,22 @@ var
   Value: Extended;
   CalcValueChangedEv: ICalcValueChanged;
 begin
+  // exit if the expression contains  a '.' followed by a '+,-,*,/'
+  var
+    Match: TMatch := TRegEx.Match(CalcString, '(\.[+\-\*\/])');
+  if Match.Success then
+    exit();
+  // exit if Expression ends in a .
+  Match := TRegEx.Match(CalcString, '(\.$)');
+  if Match.Success then
+    exit();
+
+  // Check the Expression format complies
+  Match := TRegEx.Match(CalcString, '[+-]?(\d+\.?\d*[+\-\*\/]?)*');
+  if (Match.Value <> CalcString) then
+    exit();
+
+  // if we've reached here then the Exprssion is valid
   LExpression := TBindings.CreateExpression([], CalcString);
   try
     try
